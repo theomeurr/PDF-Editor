@@ -19,6 +19,8 @@ Trois dépendances système à installer une seule fois.
 brew install ghostscript node
 ```
 
+https://ghostscript.com/releases/gsdnld.html
+
 Python 3.9+ est déjà fourni par macOS — rien à faire.
 
 ## Lancement
