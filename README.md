@@ -1,49 +1,48 @@
 # PDF Editor — local
 
 Alternative privée à ILovePDF. Fusionner et compresser des PDF sur votre machine.
-Vos fichiers ne quittent jamais votre ordinateur.
+**Vos fichiers ne quittent jamais votre navigateur.**
 
 ---
 
-## ✨ Version simple (recommandée) — un seul fichier
-
-**Aucune installation. Aucun terminal. Aucun serveur.**
+## 🚀 Utilisation — un seul fichier, aucune installation
 
 1. Téléchargez le fichier [`pdf-editor.html`](pdf-editor.html)
-   (ou cliquez sur **Code → Download ZIP** sur la page GitHub et prenez ce fichier)
-2. **Double-cliquez dessus** — il s'ouvre dans votre navigateur
+   *(sur GitHub : cliquez sur le fichier, puis sur le bouton **« Download raw file »**)*
+2. **Double-cliquez sur le fichier** — il s'ouvre dans votre navigateur
 3. Glissez vos PDF, fusionnez ou compressez, téléchargez le résultat
 
 C'est tout. ✅
 
-Les PDF sont traités **entièrement dans votre navigateur** — rien n'est envoyé sur Internet.
-Fonctionne hors-ligne après la première ouverture (les bibliothèques se mettent en cache).
+---
 
-### Fonctionnalités
+## Fonctionnalités
 
-- **Fusion** : combinez plusieurs PDF, réorganisez l'ordre des fichiers
+- **Fusion** : combinez plusieurs PDF, réorganisez l'ordre (flèches ↑ ↓)
 - **Compression** : 4 niveaux (écran / ebook / impression / prépresse)
+- **Drag & drop** pour ajouter vos fichiers
+- **Barre de progression** pendant la compression
 
-### Conseils
+## Comment ça marche
 
-- Pour la compression, le mode **Ebook** est le meilleur compromis taille / lisibilité
-- Compatible Chrome, Edge, Firefox, Safari (récents)
-- Si rien ne se passe la première fois, vérifiez votre connexion Internet
-  (les bibliothèques PDF se chargent depuis un CDN)
+Tout se passe **dans votre navigateur** :
 
----
+- **Fusion** via [pdf-lib](https://pdf-lib.js.org/) — préserve le texte sélectionnable
+- **Compression** via [pdf.js](https://mozilla.github.io/pdf.js/) : chaque page est re-rendue à la résolution choisie en image JPEG, puis ré-empaquetée dans un nouveau PDF
 
-## 🛠 Version avancée (Flask + React + installeur Windows)
+Les bibliothèques se chargent depuis un CDN à la première ouverture, puis
+sont mises en cache par votre navigateur — l'app fonctionne ensuite hors-ligne.
 
-Pour ceux qui veulent une **application Windows installable** avec raccourci
-menu Démarrer et désinstalleur : voir [WINDOWS.md](WINDOWS.md).
+## ⚠ Limite de la compression
 
-Cette version utilise Ghostscript pour une compression PDF plus fine (préserve
-mieux le texte sélectionnable), mais demande une installation plus complète.
+La compression re-rend chaque page en image. **Le texte du PDF compressé ne sera plus
+sélectionnable**. Pour la fusion, le texte est préservé normalement.
 
----
+## Compatibilité
+
+Chrome, Edge, Firefox, Safari récents (toute version de 2022+).
 
 ## Vie privée
 
-- **Version HTML simple** : 100 % navigateur. Vos fichiers ne quittent jamais la page.
-- **Version avancée** : 100 % localhost. Aucune communication hors de `127.0.0.1`.
+100 % navigateur. Aucun fichier n'est envoyé sur Internet. Vous pouvez
+même couper votre connexion après la première ouverture — tout continue de marcher.

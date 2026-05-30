@@ -1,14 +1,2 @@
-backend/.venv/
-backend/__pycache__/
-backend/*.pyc
-frontend/node_modules/
-frontend/dist/
-build/
-dist/
-*.spec.bak
-installer/output/
-installer/ghostscript/
-installer/iscc.log
 .DS_Store
 *.log
-.claude/run-frontend.sh
