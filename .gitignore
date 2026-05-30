@@ -1,0 +1,11 @@
+backend/.venv/
+backend/__pycache__/
+backend/*.pyc
+frontend/node_modules/
+frontend/dist/
+build/
+dist/
+*.spec.bak
+.DS_Store
+*.log
+.claude/run-frontend.sh
