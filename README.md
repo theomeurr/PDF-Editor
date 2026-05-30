@@ -68,10 +68,11 @@ npm install
 npm run dev
 ```
 
-## Déployer sur un autre PC (Windows .exe)
+## Déployer sur un autre PC (Windows)
 
-Pour distribuer l'app sous forme de **`PDF-Editor.exe`** double-cliquable
-sur n'importe quel PC Windows : voir [WINDOWS.md](WINDOWS.md).
+Pour distribuer l'app sous forme d'**installeur Windows** classique
+(`PDF-Editor-Setup-1.0.0.exe`) avec raccourcis menu Démarrer + bureau et
+désinstalleur : voir [WINDOWS.md](WINDOWS.md) et [installer/README.md](installer/README.md).
 
 ## Vie privée
 

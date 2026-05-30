@@ -6,6 +6,8 @@ frontend/dist/
 build/
 dist/
 *.spec.bak
+installer/output/
+installer/ghostscript/
 .DS_Store
 *.log
 .claude/run-frontend.sh

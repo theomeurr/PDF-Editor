@@ -1,10 +1,14 @@
-# PyInstaller spec — produit dist/PDF-Editor.exe
+# PyInstaller spec — mode "onedir" (un dossier dist/PDF-Editor/ que Inno Setup empaquète).
 # Usage : pyinstaller pdf-editor.spec
 
 from pathlib import Path
 
 block_cipher = None
 ROOT = Path(SPECPATH).resolve()
+
+# Icône optionnelle : si installer/icon.ico existe on l'utilise, sinon icône par défaut
+icon_path = ROOT / 'installer' / 'icon.ico'
+icon_arg = str(icon_path) if icon_path.exists() else None
 
 a = Analysis(
     ['backend/launcher.py'],
@@ -28,19 +32,25 @@ pyz = PYZ(a.pure, a.zipped_data, cipher=block_cipher)
 exe = EXE(
     pyz,
     a.scripts,
-    a.binaries,
-    a.zipfiles,
-    a.datas,
     [],
+    exclude_binaries=True,
     name='PDF-Editor',
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
     upx=False,
-    runtime_tmpdir=None,
-    console=True,   # garde une fenêtre console pour les logs ; mettre False pour cacher
+    console=False,             # pas de fenêtre console — pure double-clic
     disable_windowed_traceback=False,
-    target_arch=None,
-    codesign_identity=None,
-    entitlements_file=None,
+    icon=icon_arg,
+)
+
+coll = COLLECT(
+    exe,
+    a.binaries,
+    a.zipfiles,
+    a.datas,
+    strip=False,
+    upx=False,
+    upx_exclude=[],
+    name='PDF-Editor',
 )

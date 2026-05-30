@@ -1,7 +1,8 @@
-# Déploiement sur Windows (.exe)
+# Déploiement sur Windows
 
-Objectif : produire un **`PDF-Editor.exe`** que vous (ou n'importe quel utilisateur)
-double-cliquez pour lancer l'application. Pas de terminal, pas de configuration.
+Objectif : produire un **installeur Windows** (`PDF-Editor-Setup-1.0.0.exe`)
+que vous distribuez ; les utilisateurs l'installent comme n'importe quelle app
+classique (raccourci menu Démarrer + désinstalleur).
 
 ## Procédure
 
@@ -14,6 +15,7 @@ Installez ces trois outils sur la machine Windows qui fera le build :
 | **Python 3.10+** | https://www.python.org/downloads/ | ✅ Cochez **« Add Python to PATH »** pendant l'installation |
 | **Node.js LTS** | https://nodejs.org/ | Installation standard |
 | **Ghostscript** | https://ghostscript.com/releases/gsdnld.html | Version **64-bit** |
+| **Inno Setup 6+** | https://jrsoftware.org/isdl.php | Pour générer l'installeur |
 
 ### Étape 2 — Copier le projet sur Windows
 
@@ -31,47 +33,39 @@ Le script :
 1. vérifie que Python / Node sont installés
 2. crée l'environnement Python et installe les dépendances
 3. build le frontend (`npm run build`)
-4. lance PyInstaller pour packager le tout
+4. lance PyInstaller pour packager le tout (mode onedir)
+5. **détecte Inno Setup et compile l'installeur**
 
 Au bout de quelques minutes, vous obtenez :
 
 ```
-dist\PDF-Editor.exe
+installer\output\PDF-Editor-Setup-1.0.0.exe   ← installeur à distribuer
+dist\PDF-Editor\PDF-Editor.exe                ← version portable (dossier complet)
 ```
 
-### Étape 4 — Utiliser l'exe sur n'importe quel PC Windows
+Si Inno Setup n'est pas détecté, seul le dossier portable est produit ; vous
+pouvez ensuite ouvrir [`installer/pdf-editor.iss`](installer/pdf-editor.iss)
+manuellement dans Inno Setup Compiler.
 
-Copiez **`PDF-Editor.exe`** où vous voulez. Pour le lancer :
+> Pour les détails de personnalisation de l'installeur (icône, bundling Ghostscript,
+> version), voir [installer/README.md](installer/README.md).
 
-1. (Une seule fois sur chaque PC) installez **Ghostscript** :
+### Étape 4 — Installer sur n'importe quel PC Windows
+
+Distribuez `PDF-Editor-Setup-1.0.0.exe` à vos utilisateurs. Sur chaque PC :
+
+1. (Une seule fois) installer **Ghostscript** :
    https://ghostscript.com/releases/gsdnld.html
-2. Double-clic sur `PDF-Editor.exe`
-3. Le navigateur s'ouvre automatiquement sur `http://127.0.0.1:5001`
+   *(ou embarquez-le directement dans l'installeur — voir [installer/README.md](installer/README.md))*
+2. Double-clic sur `PDF-Editor-Setup-1.0.0.exe` → wizard d'installation classique
+3. Au premier lancement (raccourci menu Démarrer ou bureau), le navigateur s'ouvre tout seul
 
-Pour arrêter l'application, fermez la fenêtre console qui s'est ouverte.
+La désinstallation se fait via **Panneau de configuration → Applications**.
 
-## Bundling Ghostscript dans l'exe (optionnel, avancé)
+## Bundling Ghostscript
 
-Si vous voulez éviter d'installer Ghostscript sur chaque PC, vous pouvez livrer
-une version *portable* :
-
-1. Téléchargez Ghostscript et installez-le sur la machine Windows
-2. Copiez le dossier d'installation (généralement `C:\Program Files\gs\gs10.xx\`)
-   à côté de `PDF-Editor.exe` en le renommant `ghostscript/` :
-   ```
-   PDF-Editor.exe
-   ghostscript/
-       bin/
-           gswin64c.exe
-           …
-   ```
-3. ⚠ Renommez `gswin64c.exe` en `gs.exe` (le code cherche `gs`)
-4. Distribuez le dossier entier (par exemple sous forme de `.zip`)
-
-> Note licence : Ghostscript est en **AGPL**. La redistribution est libre tant
-> que vous fournissez les sources de Ghostscript avec — ce qui est facile en
-> incluant simplement l'installeur officiel. Pour usage personnel privé, aucun
-> souci.
+Voir [installer/README.md](installer/README.md#embarquer-ghostscript-dans-linstalleur)
+pour livrer une version 100 % autonome (Ghostscript embarqué dans l'installeur).
 
 ## Dépannage
 
