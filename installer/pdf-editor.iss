@@ -53,8 +53,9 @@ SolidCompression=yes
 LZMAUseSeparateProcess=yes
 
 WizardStyle=modern
+#if FileExists(AddBackslash(SourcePath) + "icon.ico")
 SetupIconFile=icon.ico
-; Si icon.ico n'existe pas, commentez la ligne ci-dessus.
+#endif
 
 [Languages]
 Name: "french"; MessagesFile: "compiler:Languages\French.isl"

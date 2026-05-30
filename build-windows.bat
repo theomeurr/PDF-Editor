@@ -79,7 +79,18 @@ echo Inno Setup trouve : "%ISCC%"
 
 echo.
 echo === [6/6] Compilation de l'installeur ===
-"%ISCC%" installer\pdf-editor.iss || (echo Echec ISCC & pause & exit /b 1)
+"%ISCC%" installer\pdf-editor.iss > installer\iscc.log 2>&1
+if errorlevel 1 (
+    echo.
+    echo ------------------------------------------------------------
+    echo ECHEC d'Inno Setup. Voici le log :
+    echo ------------------------------------------------------------
+    type installer\iscc.log
+    echo ------------------------------------------------------------
+    echo Log complet : installer\iscc.log
+    pause
+    exit /b 1
+)
 
 echo.
 echo ============================================================
