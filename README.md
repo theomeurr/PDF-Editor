@@ -3,81 +3,47 @@
 Alternative privée à ILovePDF. Fusionner et compresser des PDF sur votre machine.
 Vos fichiers ne quittent jamais votre ordinateur.
 
-## Prérequis
+---
 
-Trois dépendances système à installer une seule fois.
+## ✨ Version simple (recommandée) — un seul fichier
 
-### 1. Homebrew (si vous ne l'avez pas)
+**Aucune installation. Aucun terminal. Aucun serveur.**
 
-```bash
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-```
+1. Téléchargez le fichier [`pdf-editor.html`](pdf-editor.html)
+   (ou cliquez sur **Code → Download ZIP** sur la page GitHub et prenez ce fichier)
+2. **Double-cliquez dessus** — il s'ouvre dans votre navigateur
+3. Glissez vos PDF, fusionnez ou compressez, téléchargez le résultat
 
-### 2. Ghostscript + Node.js
+C'est tout. ✅
 
-```bash
-brew install ghostscript node
-```
+Les PDF sont traités **entièrement dans votre navigateur** — rien n'est envoyé sur Internet.
+Fonctionne hors-ligne après la première ouverture (les bibliothèques se mettent en cache).
 
-https://ghostscript.com/releases/gsdnld.html
+### Fonctionnalités
 
-Python 3.9+ est déjà fourni par macOS — rien à faire.
+- **Fusion** : combinez plusieurs PDF, réorganisez l'ordre des fichiers
+- **Compression** : 4 niveaux (écran / ebook / impression / prépresse)
 
-## Lancement
+### Conseils
 
-À la racine du projet :
+- Pour la compression, le mode **Ebook** est le meilleur compromis taille / lisibilité
+- Compatible Chrome, Edge, Firefox, Safari (récents)
+- Si rien ne se passe la première fois, vérifiez votre connexion Internet
+  (les bibliothèques PDF se chargent depuis un CDN)
 
-```bash
-./start.sh
-```
+---
 
-Au premier démarrage, le script crée le venv Python, installe les paquets npm,
-puis lance le backend (Flask, port 5001) et le frontend (Vite, port 5173).
+## 🛠 Version avancée (Flask + React + installeur Windows)
 
-Ouvrez ensuite : **http://127.0.0.1:5173**
+Pour ceux qui veulent une **application Windows installable** avec raccourci
+menu Démarrer et désinstalleur : voir [WINDOWS.md](WINDOWS.md).
 
-## Structure
+Cette version utilise Ghostscript pour une compression PDF plus fine (préserve
+mieux le texte sélectionnable), mais demande une installation plus complète.
 
-```
-.
-├── backend/         # Flask + pypdf + Ghostscript
-│   ├── app.py
-│   └── requirements.txt
-├── frontend/        # React + Vite + Tailwind
-│   └── src/
-└── start.sh         # Lance back + front
-```
-
-## Fonctionnalités
-
-- **Fusion** : combine plusieurs PDF, réorganisation par glisser ou avec les flèches.
-- **Compression** : quatre niveaux (écran / ebook / impression / prépresse) via Ghostscript.
-
-## Lancement manuel (sans script)
-
-Backend :
-```bash
-cd backend
-python3 -m venv .venv
-.venv/bin/pip install -r requirements.txt
-.venv/bin/python app.py
-```
-
-Frontend (dans un autre terminal) :
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-## Déployer sur un autre PC (Windows)
-
-Pour distribuer l'app sous forme d'**installeur Windows** classique
-(`PDF-Editor-Setup-1.0.0.exe`) avec raccourcis menu Démarrer + bureau et
-désinstalleur : voir [WINDOWS.md](WINDOWS.md) et [installer/README.md](installer/README.md).
+---
 
 ## Vie privée
 
-- Aucune communication réseau hors de `127.0.0.1`.
-- Les PDF sont traités en mémoire ou dans `/tmp` et supprimés immédiatement après usage.
-- Aucun journal de fichier.
+- **Version HTML simple** : 100 % navigateur. Vos fichiers ne quittent jamais la page.
+- **Version avancée** : 100 % localhost. Aucune communication hors de `127.0.0.1`.
