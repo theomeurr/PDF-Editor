@@ -8,7 +8,13 @@ classique (raccourci menu Démarrer + désinstalleur).
 
 ### Étape 1 — Une seule fois : préparer une machine Windows pour le *build*
 
-Installez ces trois outils sur la machine Windows qui fera le build :
+**Option rapide (recommandée)** : double-cliquez sur **`install-prerequisites.bat`**
+à la racine du projet. Le script installe automatiquement Python, Node.js,
+Ghostscript, Inno Setup et Git via `winget` (gestionnaire de paquets intégré
+à Windows 10/11). Fermez ensuite la fenêtre et ouvrez-en une nouvelle pour
+que le PATH soit à jour.
+
+**Option manuelle** : installez ces outils un par un :
 
 | Outil | Lien | Note |
 |-------|------|------|
