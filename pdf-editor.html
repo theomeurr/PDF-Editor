@@ -15,6 +15,12 @@
 <style>
   body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; }
   .drop.dragover { border-color: #e11d48; background: #fef2f2; }
+  .merge-item              { cursor: grab; transition: background 0.12s, opacity 0.12s; }
+  .merge-item:active       { cursor: grabbing; }
+  .merge-item.dragging     { opacity: 0.35; }
+  .merge-item.drop-before  { box-shadow: inset 0 3px 0 0 #e11d48; }
+  .merge-item.drop-after   { box-shadow: inset 0 -3px 0 0 #e11d48; }
+  .merge-item button       { cursor: pointer; }
 </style>
 </head>
 <body class="bg-slate-50 min-h-screen flex flex-col">
@@ -49,6 +55,7 @@
       <p class="text-sm text-slate-500 mt-1">ou cliquez pour parcourir</p>
     </div>
 
+    <p id="merge-hint" class="hidden text-xs text-slate-500">💡 Glissez-déposez les éléments de la liste pour changer leur ordre, ou utilisez les flèches ↑ ↓.</p>
     <ul id="merge-list" class="bg-white border border-slate-200 rounded-xl divide-y divide-slate-100 hidden"></ul>
 
     <div id="merge-error" class="hidden bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm"></div>
@@ -217,27 +224,41 @@ const mergeList  = document.getElementById('merge-list');
 const mergeGo    = document.getElementById('merge-go');
 const mergeClear = document.getElementById('merge-clear');
 const mergeErr   = document.getElementById('merge-error');
+const mergeHint  = document.getElementById('merge-hint');
+
+let dragSrcIdx = null;  // index de l'élément en cours de drag
+
+function clearDropMarkers() {
+  mergeList.querySelectorAll('.drop-before, .drop-after').forEach(el => {
+    el.classList.remove('drop-before', 'drop-after');
+  });
+}
 
 function renderMergeList() {
   mergeList.innerHTML = '';
   if (mergeState.files.length === 0) {
     mergeList.classList.add('hidden');
+    mergeHint.classList.add('hidden');
     mergeClear.classList.add('hidden');
     mergeGo.disabled = true;
     mergeGo.textContent = 'Fusionner';
     return;
   }
   mergeList.classList.remove('hidden');
+  mergeHint.classList.toggle('hidden', mergeState.files.length < 2);
   mergeClear.classList.remove('hidden');
   mergeGo.disabled = mergeState.files.length < 2;
   mergeGo.textContent = `Fusionner ${mergeState.files.length} PDF`;
 
   mergeState.files.forEach((f, idx) => {
     const li = document.createElement('li');
-    li.className = 'flex items-center gap-3 px-4 py-3';
+    li.className = 'merge-item flex items-center gap-3 px-4 py-3 select-none';
+    li.draggable = true;
+    li.dataset.idx = String(idx);
     li.innerHTML = `
-      <span class="text-slate-400 text-sm w-6">${idx + 1}</span>
-      <div class="flex-1 min-w-0">
+      <span class="text-slate-300 text-lg leading-none" title="Glissez pour réordonner">⋮⋮</span>
+      <span class="text-slate-400 text-sm w-6 text-right">${idx + 1}</span>
+      <div class="flex-1 min-w-0 pointer-events-none">
         <p class="text-sm font-medium text-slate-800 truncate"></p>
         <p class="text-xs text-slate-500">${formatBytes(f.size)}</p>
       </div>
@@ -246,9 +267,64 @@ function renderMergeList() {
       <button class="rm p-1 text-slate-400 hover:text-red-600" title="Retirer">✕</button>
     `;
     li.querySelector('p.truncate').textContent = f.name;
+
+    // Boutons : empêcher le drag de démarrer quand on clique dessus
+    li.querySelectorAll('button').forEach(b => {
+      b.addEventListener('mousedown', (e) => e.stopPropagation());
+      b.addEventListener('dragstart', (e) => e.preventDefault());
+    });
     li.querySelector('.up').addEventListener('click',   () => { swap(idx, idx - 1); });
     li.querySelector('.down').addEventListener('click', () => { swap(idx, idx + 1); });
     li.querySelector('.rm').addEventListener('click',   () => { mergeState.files.splice(idx, 1); renderMergeList(); });
+
+    // ----- Drag & drop -----
+    li.addEventListener('dragstart', (e) => {
+      dragSrcIdx = idx;
+      li.classList.add('dragging');
+      e.dataTransfer.effectAllowed = 'move';
+      // pour Firefox : il faut écrire un payload dans dataTransfer
+      try { e.dataTransfer.setData('text/plain', String(idx)); } catch (_) {}
+    });
+    li.addEventListener('dragend', () => {
+      li.classList.remove('dragging');
+      clearDropMarkers();
+      dragSrcIdx = null;
+    });
+    li.addEventListener('dragover', (e) => {
+      if (dragSrcIdx === null || dragSrcIdx === idx) return;
+      e.preventDefault();
+      e.dataTransfer.dropEffect = 'move';
+      // Position du curseur dans l'item : moitié haute → insertion avant, moitié basse → après
+      const rect = li.getBoundingClientRect();
+      const before = (e.clientY - rect.top) < rect.height / 2;
+      clearDropMarkers();
+      li.classList.add(before ? 'drop-before' : 'drop-after');
+    });
+    li.addEventListener('dragleave', (e) => {
+      // Ne retire le marker que si on quitte vraiment l'item (pas un enfant)
+      if (!li.contains(e.relatedTarget)) {
+        li.classList.remove('drop-before', 'drop-after');
+      }
+    });
+    li.addEventListener('drop', (e) => {
+      e.preventDefault();
+      if (dragSrcIdx === null || dragSrcIdx === idx) {
+        clearDropMarkers();
+        return;
+      }
+      const rect = li.getBoundingClientRect();
+      const before = (e.clientY - rect.top) < rect.height / 2;
+      let targetIdx = before ? idx : idx + 1;
+      // Si on déplace vers l'avant, l'index cible se décale après le retrait
+      if (dragSrcIdx < targetIdx) targetIdx--;
+
+      const [moved] = mergeState.files.splice(dragSrcIdx, 1);
+      mergeState.files.splice(targetIdx, 0, moved);
+      dragSrcIdx = null;
+      clearDropMarkers();
+      renderMergeList();
+    });
+
     mergeList.appendChild(li);
   });
 }
