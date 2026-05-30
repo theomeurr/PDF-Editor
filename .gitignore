@@ -1,2 +1,16 @@
+# Dossiers de build / runtime éventuels (au cas où l'ancien stack ressurgit)
+backend/
+frontend/
+.venv/
+node_modules/
+dist/
+build/
+installer/
+*.spec
+
+# OS
 .DS_Store
 *.log
+
+# Claude local
+.claude/
