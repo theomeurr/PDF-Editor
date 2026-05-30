@@ -87,24 +87,54 @@ Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChang
 Type: filesandordirs; Name: "{localappdata}\PDF-Editor"
 
 [Code]
+function GhostscriptInstalled(): Boolean;
+begin
+  // 1. Cles registre : winget et l'installeur officiel ecrivent ici
+  if RegKeyExists(HKLM, 'SOFTWARE\GPL Ghostscript') then begin
+    Result := True; exit;
+  end;
+  if RegKeyExists(HKLM64, 'SOFTWARE\GPL Ghostscript') then begin
+    Result := True; exit;
+  end;
+  if RegKeyExists(HKLM, 'SOFTWARE\WOW6432Node\GPL Ghostscript') then begin
+    Result := True; exit;
+  end;
+  if RegKeyExists(HKCU, 'SOFTWARE\GPL Ghostscript') then begin
+    Result := True; exit;
+  end;
+
+  // 2. Dossier d'installation standard
+  if DirExists(ExpandConstant('{commonpf64}\gs')) then begin
+    Result := True; exit;
+  end;
+  if DirExists(ExpandConstant('{commonpf32}\gs')) then begin
+    Result := True; exit;
+  end;
+
+  // 3. Ghostscript portable embarque a cote de l'installeur
+  if FileExists(ExpandConstant('{src}\ghostscript\bin\gs.exe')) then begin
+    Result := True; exit;
+  end;
+  if FileExists(ExpandConstant('{src}\ghostscript\bin\gswin64c.exe')) then begin
+    Result := True; exit;
+  end;
+
+  Result := False;
+end;
+
 function InitializeSetup(): Boolean;
-var
-  GsPath: String;
 begin
   Result := True;
 
-  // Détecte Ghostscript installé. Si absent, prévient l'utilisateur mais autorise l'installation.
-  if not RegQueryStringValue(HKLM, 'SOFTWARE\GPL Ghostscript', '', GsPath)
-     and not RegQueryStringValue(HKLM, 'SOFTWARE\WOW6432Node\GPL Ghostscript', '', GsPath)
-     and not FileExists(ExpandConstant('{src}\ghostscript\bin\gs.exe')) then
+  if not GhostscriptInstalled() then
   begin
     if MsgBox(
-      'Ghostscript n''a pas été détecté sur ce PC.' + #13#10 + #13#10 +
-      'PDF Editor en a besoin pour la fonction de compression PDF.' + #13#10 +
-      'La fusion fonctionnera quand même.' + #13#10 + #13#10 +
-      'Vous pouvez télécharger Ghostscript ici :' + #13#10 +
+      'Ghostscript n''a pas ete detecte sur ce PC.' + #13#10 + #13#10 +
+      'PDF Editor en a besoin pour la compression PDF.' + #13#10 +
+      'La fusion fonctionnera quand meme.' + #13#10 + #13#10 +
+      'Telechargez Ghostscript ici :' + #13#10 +
       'https://ghostscript.com/releases/gsdnld.html' + #13#10 + #13#10 +
-      'Continuer l''installation quand même ?',
+      'Continuer l''installation quand meme ?',
       mbConfirmation, MB_YESNO) = IDNO then
     begin
       Result := False;
